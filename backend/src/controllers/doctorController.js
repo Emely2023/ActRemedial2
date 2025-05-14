@@ -13,7 +13,7 @@ doctorController.createDoctor = async (req, res) => {
   const { name, specialty, email, password } = req.body;
   const newDoctor = new doctorModel({ name, specialty, email, password });
   await newDoctor.save();
-  res.json({ message: "Doctor saved" });
+  res.json({ message: "Doctor guardadisimo" });
 };
 
 // DELETE 
