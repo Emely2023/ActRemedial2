@@ -78,5 +78,32 @@ recoveryPasswordController.verifyCode = async (req, res) => {
     res.status(401).json({ message: "Token inválido o expirado" });
   }
 };
+//Cambiar Contraseña
+recoveryPasswordController.changePassword = async (req, res) => {
+  const { newPassword } = req.body;
+
+  try {
+    const token = req.cookies.tokenRecoveryCode;
+    const decoded = jsonwebtoken.verify(token, config.JWT.secret);
+
+    if (!decoded.verified) {
+      return res.status(401).json({ message: "Code not verified" });
+    }
+
+    const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+    await doctorModel.updateOne(
+      { email: decoded.email },
+      { $set: { password: hashedPassword } }
+    );
+
+    res.clearCookie("tokenRecoveryCode");
+    res.json({ message: "Tu contraseña ha sido actualizada exitosamente" });
+  } catch (error) {
+    console.log("Error updating password: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 
 export default recoveryPasswordController;
